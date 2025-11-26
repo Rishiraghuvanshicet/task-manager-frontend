@@ -14,10 +14,10 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Cancel, Save } from '@mui/icons-material';
-import { toast } from 'react-toastify';
-import { taskService } from '../services/api';
+import { useTasks } from '../context/TaskContext';
 
 const EditTask = ({ taskId, onCancel, onSuccess }) => {
+  const { getTaskById, updateTask } = useTasks();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -34,16 +34,15 @@ const EditTask = ({ taskId, onCancel, onSuccess }) => {
   const loadTask = async () => {
     try {
       setFetching(true);
-      const task = await taskService.getTaskById(taskId);
+      const task = await getTaskById(taskId);
       setFormData({
         title: task.title || '',
         description: task.description || '',
         status: task.status || 'todo',
       });
     } catch (err) {
-      const errorMessage = 'Failed to load task: ' + err.message;
+      const errorMessage = 'Failed to load task: ' + (err.message || '');
       setError(errorMessage);
-      toast.error(errorMessage);
     } finally {
       setFetching(false);
     }
@@ -69,17 +68,15 @@ const EditTask = ({ taskId, onCancel, onSuccess }) => {
     try {
       setLoading(true);
       setError('');
-      await taskService.updateTask(taskId, {
+      await updateTask(taskId, {
         title: formData.title.trim(),
         description: formData.description.trim(),
         status: formData.status,
       });
-      toast.success('Task updated successfully!');
       if (onSuccess) onSuccess();
     } catch (err) {
       const errorMessage = err.message || 'Failed to update task';
       setError(errorMessage);
-      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -14,10 +14,10 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Cancel, Save } from '@mui/icons-material';
-import { toast } from 'react-toastify';
-import { taskService } from '../services/api';
+import { useTasks } from '../context/TaskContext';
 
 const AddTask = ({ onCancel, onSuccess }) => {
+  const { createTask } = useTasks();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -46,17 +46,15 @@ const AddTask = ({ onCancel, onSuccess }) => {
     try {
       setLoading(true);
       setError('');
-      await taskService.createTask({
+      await createTask({
         title: formData.title.trim(),
         description: formData.description.trim(),
         status: formData.status,
       });
-      toast.success('Task created successfully!');
       if (onSuccess) onSuccess();
     } catch (err) {
       const errorMessage = err.message || 'Failed to create task';
       setError(errorMessage);
-      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

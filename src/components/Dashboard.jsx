@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -14,38 +14,16 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { Search } from '@mui/icons-material';
-import { toast } from 'react-toastify';
-import { taskService } from '../services/api';
+import { useTasks } from '../context/TaskContext';
 import TaskCard from './TaskCard';
 
 const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
-  const [tasks, setTasks] = useState([]);
+  const { tasks, loading, error, loadTasks, deleteTask, getTaskCounts } = useTasks();
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // load ALL tasks from API (always fetch all, filter client-side for consistency)
-  const loadTasks = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      // Always fetch all tasks to ensure counts are accurate
-      const data = await taskService.getTasks('', '');
-      setTasks(Array.isArray(data) ? data : []);
-    } catch (err) {
-      const errorMessage = err?.message || 'Failed to load tasks';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      console.error('Error loading tasks:', err);
-      setTasks([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // load tasks on mount only
+  // load tasks on mount
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
@@ -89,26 +67,11 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
   const handleDelete = async (taskId) => {
     if (!window.confirm('Are you sure you want to delete this task?')) return;
     try {
-      await taskService.deleteTask(taskId);
-      toast.success('Task deleted successfully!');
-      // reload from server
-      await loadTasks();
+      await deleteTask(taskId);
       if (onDeleteTask) onDeleteTask();
     } catch (err) {
-      const errorMessage = 'Failed to delete task: ' + (err?.message || '');
-      toast.error(errorMessage);
+      // Error is already handled in context
     }
-  };
-
-  const getTaskCounts = () => {
-    if (!tasks || !Array.isArray(tasks)) {
-      return { all: 0, todo: 0, inProgress: 0, completed: 0 };
-    }
-    const all = tasks.length;
-    const todo = tasks.filter((t) => t.status === 'todo').length;
-    const inProgress = tasks.filter((t) => t.status === 'in-progress').length;
-    const completed = tasks.filter((t) => t.status === 'completed').length;
-    return { all, todo, inProgress, completed };
   };
 
   const counts = getTaskCounts();
@@ -121,10 +84,10 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
           📋
         </Typography>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: '#1F2937', mb: 0.5 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}>
             Dashboard
           </Typography>
-          <Typography variant="body1" sx={{ color: '#6B7280' }}>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
             Manage and track your tasks efficiently
           </Typography>
         </Box>
@@ -141,7 +104,7 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search sx={{ color: '#9CA3AF' }} />
+                <Search sx={{ color: 'text.secondary' }} />
               </InputAdornment>
             ),
           }}
@@ -242,7 +205,7 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
         </Alert>
       ) : filteredTasks.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography variant="body1" sx={{ color: '#6B7280' }}>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
             No tasks found. Create your first task!
           </Typography>
         </Box>

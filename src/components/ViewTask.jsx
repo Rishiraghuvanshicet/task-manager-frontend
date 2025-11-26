@@ -13,9 +13,10 @@ import {
   IconButton,
 } from '@mui/material';
 import { Close, Edit } from '@mui/icons-material';
-import { taskService } from '../services/api';
+import { useTasks } from '../context/TaskContext';
 
 const ViewTask = ({ taskId, onClose, onEdit }) => {
+  const { getTaskById } = useTasks();
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -28,10 +29,10 @@ const ViewTask = ({ taskId, onClose, onEdit }) => {
     try {
       setLoading(true);
       setError('');
-      const data = await taskService.getTaskById(taskId);
+      const data = await getTaskById(taskId);
       setTask(data);
     } catch (err) {
-      setError('Failed to load task: ' + err.message);
+      setError('Failed to load task: ' + (err.message || ''));
     } finally {
       setLoading(false);
     }

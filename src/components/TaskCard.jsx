@@ -107,7 +107,7 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
             variant="subtitle1"
             sx={{
               fontWeight: 700,
-              color: "#111827",
+              color: "text.primary",
               fontSize: 18,
               maxWidth: "76%",
               overflow: "hidden",
@@ -143,7 +143,7 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
         <Typography
           variant="body2"
           sx={{
-            color: "#4B5563",
+            color: "text.secondary",
             fontSize: 14,
             lineHeight: 1.6,
             mt: 0.5,
@@ -164,7 +164,7 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
 
         {/* bottom row: created date and action icons */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-          <Typography variant="caption" sx={{ color: "#9CA3AF", fontSize: 12 }}>
+          <Typography variant="caption" sx={{ color: "text.disabled", fontSize: 12 }}>
             Created: {createdDate}
           </Typography>
 
