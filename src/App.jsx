@@ -57,9 +57,7 @@ function App() {
       >
         <Toolbar sx={{ justifyContent: 'space-between', px: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Typography variant="h6" sx={{ fontSize: '24px' }}>
-              📋
-            </Typography>
+
             <Typography variant="h6" sx={{ fontWeight: 600, color: '#1F2937' }}>
               Task Manager
             </Typography>

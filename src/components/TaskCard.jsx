@@ -9,36 +9,27 @@ import {
 } from "@mui/material";
 import { Visibility, Edit, Delete } from "@mui/icons-material";
 
-/**
- * TaskCard - styled to match the provided screenshot:
- *  - Rounded card with a colored top border (accent)
- *  - Title left, status chip right (small rounded pill)
- *  - Description clamps to ~4 lines
- *  - Created date above bottom action icons
- *  - Action icons (view/edit/delete) aligned bottom-right
- */
-
 const STATUS = {
   "todo": {
     key: "todo",
     label: "To Do",
-    color: "#6B7280",    // gray
+    color: "#6B7280",
     bg: "#F3F4F6",
     topColor: "#E5E7EB"
   },
   "in-progress": {
     key: "in-progress",
     label: "In Progress",
-    color: "#B45309",   // darker orange text
+    color: "#B45309",
     bg: "#FFF7ED",
-    topColor: "#F97316" // orange top strip
+    topColor: "#F97316"
   },
   "completed": {
     key: "completed",
     label: "Completed",
-    color: "#166534",   // dark green text
+    color: "#166534",
     bg: "#ECFDF5",
-    topColor: "#16A34A" // green top strip
+    topColor: "#16A34A"
   }
 };
 
@@ -75,27 +66,28 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
       sx={{
         position: "relative",
         borderRadius: 2.5,
-        // top colored strip (rounded ends)
-        "::before": {
+        // top colored strip (rounded ends). pointerEvents none so it doesn't block layout
+        "&::before": {
           content: '""',
           position: "absolute",
           left: 12,
           right: 12,
-          top: 8,
+          top: 10,
           height: 8,
           borderRadius: "8px",
           backgroundColor: statusInfo.topColor,
-          zIndex: 1
+          zIndex: 1,
+          pointerEvents: "none"
         },
-        // card style
+        // card visual
         boxShadow: "0 6px 18px rgba(15,23,42,0.06)",
-        overflow: "visible",
+        overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        height: 340
+        height: "100%",
+        width: "100%"
       }}
     >
-      {/* ensure content sits above the top strip */}
       <CardContent
         sx={{
           position: "relative",
@@ -105,7 +97,8 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
           display: "flex",
           flexDirection: "column",
           gap: 1.25,
-          height: "100%"
+          // allow CardContent to grow and push actions to bottom
+          flex: 1
         }}
       >
         {/* top row: title (left) and status chip (right) */}
@@ -121,6 +114,7 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
               textOverflow: "ellipsis",
               whiteSpace: "nowrap"
             }}
+            title={task.title}
           >
             {task.title}
           </Typography>
@@ -153,28 +147,27 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
             fontSize: 14,
             lineHeight: 1.6,
             mt: 0.5,
-            // clamp to ~4 lines
             display: "-webkit-box",
             WebkitLineClamp: 4,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            minHeight: 84
+            height: "84px",
+            flexShrink: 0
           }}
         >
           {task.description || "No description"}
         </Typography>
 
-        {/* spacer to push created date and actions down */}
+        {/* spacer - ensures created date + actions sit at bottom */}
         <Box sx={{ flex: 1 }} />
 
-        {/* created date + horizontal divider (subtle) */}
+        {/* bottom row: created date and action icons */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
           <Typography variant="caption" sx={{ color: "#9CA3AF", fontSize: 12 }}>
             Created: {createdDate}
           </Typography>
 
-          {/* actions: view / edit / delete */}
           <Box sx={{ display: "flex", gap: 0.75 }}>
             <IconButton
               size="small"

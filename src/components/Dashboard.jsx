@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -26,23 +26,16 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    loadTasks();
-  }, [statusFilter]);
-
-  useEffect(() => {
-    filterTasks();
-  }, [tasks, searchQuery, statusFilter]);
-
-  const loadTasks = async () => {
+  // load ALL tasks from API (always fetch all, filter client-side for consistency)
+  const loadTasks = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const status = statusFilter === 'all' ? '' : statusFilter;
-      const data = await taskService.getTasks('', status);
+      // Always fetch all tasks to ensure counts are accurate
+      const data = await taskService.getTasks('', '');
       setTasks(Array.isArray(data) ? data : []);
     } catch (err) {
-      const errorMessage = err.message || 'Failed to load tasks';
+      const errorMessage = err?.message || 'Failed to load tasks';
       setError(errorMessage);
       toast.error(errorMessage);
       console.error('Error loading tasks:', err);
@@ -50,27 +43,36 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const filterTasks = () => {
+  // load tasks on mount only
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
+
+  // apply client-side filtering (search + status) — keeps UI snappy and consistent
+  useEffect(() => {
     if (!tasks || !Array.isArray(tasks)) {
       setFilteredTasks([]);
       return;
     }
-    
-    let filtered = [...tasks];
 
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (task) =>
-          task.title.toLowerCase().includes(query) ||
-          (task.description && task.description.toLowerCase().includes(query))
-      );
-    }
+    const q = searchQuery.trim().toLowerCase();
+    const status = statusFilter; // 'all' | 'todo' | 'in-progress' | 'completed'
+
+    const filtered = tasks.filter((task) => {
+      // status filter (apply client-side in case backend didn't)
+      if (status !== 'all' && task.status !== status) return false;
+
+      // search filter
+      if (!q) return true;
+      const inTitle = task.title?.toLowerCase().includes(q);
+      const inDesc = !!task.description && task.description.toLowerCase().includes(q);
+      return inTitle || inDesc;
+    });
 
     setFilteredTasks(filtered);
-  };
+  }, [tasks, searchQuery, statusFilter]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -85,16 +87,16 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
   };
 
   const handleDelete = async (taskId) => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
-      try {
-        await taskService.deleteTask(taskId);
-        toast.success('Task deleted successfully!');
-        await loadTasks();
-        if (onDeleteTask) onDeleteTask();
-      } catch (err) {
-        const errorMessage = 'Failed to delete task: ' + err.message;
-        toast.error(errorMessage);
-      }
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+    try {
+      await taskService.deleteTask(taskId);
+      toast.success('Task deleted successfully!');
+      // reload from server
+      await loadTasks();
+      if (onDeleteTask) onDeleteTask();
+    } catch (err) {
+      const errorMessage = 'Failed to delete task: ' + (err?.message || '');
+      toast.error(errorMessage);
     }
   };
 
@@ -245,9 +247,19 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
           </Typography>
         </Box>
       ) : (
-        <Grid container spacing={2.5}>
+        <Grid container spacing={2.5} sx={{ alignItems: 'stretch' }}>
           {filteredTasks.map((task) => (
-            <Grid item xs={12} sm={6} md={4} key={task._id} sx={{ display: 'flex', height: '320px' }}>
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              key={task._id || task.id}
+              sx={{
+                display: 'flex',
+                height: '320px'
+              }}
+            >
               <TaskCard
                 task={task}
                 onView={onViewTask}
@@ -263,4 +275,3 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
 };
 
 export default Dashboard;
-
