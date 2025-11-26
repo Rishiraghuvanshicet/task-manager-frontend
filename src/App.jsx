@@ -31,7 +31,6 @@ function AppContent() {
   };
 
   const handleDeleteTask = () => {
-    // Task will be updated via context
   };
 
   const handleCancel = () => {

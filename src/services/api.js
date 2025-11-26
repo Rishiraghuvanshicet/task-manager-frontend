@@ -1,7 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://task-manager-backend-aezg.onrender.com/api';
 
 export const taskService = {
-  // Get all tasks with optional search and status filters
   getTasks: async (search = '', status = '') => {
     const params = new URLSearchParams();
     if (search) params.append('search', search);
@@ -14,7 +13,6 @@ export const taskService = {
     return response.json();
   },
 
-  // Get a single task by ID
   getTaskById: async (id) => {
     const response = await fetch(`${API_BASE_URL}/tasks/${id}`);
     if (!response.ok) {
@@ -23,7 +21,6 @@ export const taskService = {
     return response.json();
   },
 
-  // Create a new task
   createTask: async (taskData) => {
     const response = await fetch(`${API_BASE_URL}/tasks`, {
       method: 'POST',
@@ -39,7 +36,6 @@ export const taskService = {
     return response.json();
   },
 
-  // Update an existing task
   updateTask: async (id, taskData) => {
     const response = await fetch(`${API_BASE_URL}/tasks/${id}`, {
       method: 'PUT',
@@ -55,7 +51,6 @@ export const taskService = {
     return response.json();
   },
 
-  // Delete a task
   deleteTask: async (id) => {
     const response = await fetch(`${API_BASE_URL}/tasks/${id}`, {
       method: 'DELETE',

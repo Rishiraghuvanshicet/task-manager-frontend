@@ -17,7 +17,6 @@ export const TaskProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Load all tasks from API
   const loadTasks = useCallback(async () => {
     try {
       setLoading(true);
@@ -35,7 +34,6 @@ export const TaskProvider = ({ children }) => {
     }
   }, []);
 
-  // Create a new task
   const createTask = useCallback(async (taskData) => {
     try {
       const newTask = await taskService.createTask(taskData);
@@ -49,7 +47,6 @@ export const TaskProvider = ({ children }) => {
     }
   }, []);
 
-  // Update an existing task
   const updateTask = useCallback(async (id, taskData) => {
     try {
       const updatedTask = await taskService.updateTask(id, taskData);
@@ -65,7 +62,6 @@ export const TaskProvider = ({ children }) => {
     }
   }, []);
 
-  // Delete a task
   const deleteTask = useCallback(async (id) => {
     try {
       await taskService.deleteTask(id);
@@ -78,7 +74,6 @@ export const TaskProvider = ({ children }) => {
     }
   }, []);
 
-  // Get task by ID
   const getTaskById = useCallback(async (id) => {
     try {
       const task = await taskService.getTaskById(id);
@@ -90,7 +85,6 @@ export const TaskProvider = ({ children }) => {
     }
   }, []);
 
-  // Get task counts
   const getTaskCounts = useCallback(() => {
     if (!tasks || !Array.isArray(tasks)) {
       return { all: 0, todo: 0, inProgress: 0, completed: 0 };

@@ -66,7 +66,6 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
       sx={{
         position: "relative",
         borderRadius: 2.5,
-        // top colored strip (rounded ends). pointerEvents none so it doesn't block layout
         "&::before": {
           content: '""',
           position: "absolute",
@@ -79,7 +78,6 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
           zIndex: 1,
           pointerEvents: "none"
         },
-        // card visual
         boxShadow: "0 6px 18px rgba(15,23,42,0.06)",
         overflow: "hidden",
         display: "flex",
@@ -97,11 +95,9 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
           display: "flex",
           flexDirection: "column",
           gap: 1.25,
-          // allow CardContent to grow and push actions to bottom
           flex: 1
         }}
       >
-        {/* top row: title (left) and status chip (right) */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
           <Typography
             variant="subtitle1"
@@ -139,7 +135,6 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
           />
         </Box>
 
-        {/* description (clamped lines) */}
         <Typography
           variant="body2"
           sx={{
@@ -159,10 +154,8 @@ const TaskCard = ({ task, onView, onEdit, onDelete }) => {
           {task.description || "No description"}
         </Typography>
 
-        {/* spacer - ensures created date + actions sit at bottom */}
         <Box sx={{ flex: 1 }} />
 
-        {/* bottom row: created date and action icons */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
           <Typography variant="caption" sx={{ color: "text.disabled", fontSize: 12 }}>
             Created: {createdDate}

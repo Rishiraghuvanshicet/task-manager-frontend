@@ -23,12 +23,10 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // load tasks on mount
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
 
-  // apply client-side filtering (search + status) — keeps UI snappy and consistent
   useEffect(() => {
     if (!tasks || !Array.isArray(tasks)) {
       setFilteredTasks([]);
@@ -36,13 +34,11 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
     }
 
     const q = searchQuery.trim().toLowerCase();
-    const status = statusFilter; // 'all' | 'todo' | 'in-progress' | 'completed'
+    const status = statusFilter;
 
     const filtered = tasks.filter((task) => {
-      // status filter (apply client-side in case backend didn't)
       if (status !== 'all' && task.status !== status) return false;
 
-      // search filter
       if (!q) return true;
       const inTitle = task.title?.toLowerCase().includes(q);
       const inDesc = !!task.description && task.description.toLowerCase().includes(q);
@@ -70,7 +66,6 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
       await deleteTask(taskId);
       if (onDeleteTask) onDeleteTask();
     } catch (err) {
-      // Error is already handled in context
     }
   };
 
@@ -78,7 +73,6 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
 
   return (
     <Box sx={{ p: 3, maxWidth: 1400, mx: 'auto' }}>
-      {/* Dashboard Header */}
       <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
         <Typography variant="h4" sx={{ fontSize: '48px' }}>
           📋
@@ -93,7 +87,6 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
         </Box>
       </Box>
 
-      {/* Search and Filter Controls */}
       <Box sx={{ display: 'flex', gap: 2, mb: 2.5, alignItems: 'center' }}>
         <TextField
           placeholder="Search tasks..."
@@ -130,7 +123,6 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
         </FormControl>
       </Box>
 
-      {/* Filter Buttons */}
       <Box sx={{ display: 'flex', gap: 1.5, mb: 3, flexWrap: 'wrap' }}>
         <Button
           variant={statusFilter === 'all' ? 'contained' : 'outlined'}
@@ -194,7 +186,6 @@ const Dashboard = ({ onAddTask, onEditTask, onViewTask, onDeleteTask }) => {
         </Button>
       </Box>
 
-      {/* Tasks Grid */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
           <CircularProgress />
